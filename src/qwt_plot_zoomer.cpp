@@ -447,18 +447,12 @@ void QwtPlotZoomer::rescale()
 
 /*!
    Reinitialize the axes, and set the zoom base to their scales.
-
-   \param xAxisId X axis
-   \param yAxisId Y axis
  */
 
-void QwtPlotZoomer::setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId )
+void QwtPlotZoomer::axesChanged()
 {
-    if ( xAxisId != QwtPlotPicker::xAxis() || yAxisId != QwtPlotPicker::yAxis() )
-    {
-        QwtPlotPicker::setAxes( xAxisId, yAxisId );
-        setZoomBase( scaleRect() );
-    }
+    QwtPlotPicker::axesChanged();
+    setZoomBase( scaleRect() );
 }
 
 /*!

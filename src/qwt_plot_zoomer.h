@@ -92,8 +92,6 @@ class QWT_EXPORT QwtPlotZoomer : public QwtPlotPicker
     QRectF zoomBase() const;
     QRectF zoomRect() const;
 
-    virtual void setAxes( QwtAxisId xAxis, QwtAxisId yAxis ) QWT_OVERRIDE;
-
     void setMaxStackDepth( int );
     int maxStackDepth() const;
 
@@ -131,6 +129,8 @@ class QWT_EXPORT QwtPlotZoomer : public QwtPlotPicker
     virtual void begin() QWT_OVERRIDE;
     virtual bool end( bool ok = true ) QWT_OVERRIDE;
     virtual bool accept( QPolygon& ) const QWT_OVERRIDE;
+
+    virtual void axesChanged() QWT_OVERRIDE;
 
   private:
     void init( bool doReplot );

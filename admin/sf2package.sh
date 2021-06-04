@@ -228,7 +228,7 @@ function prepare4Unix {
 ##########################
 
 QWTDIR=
-BRANCH=develop
+BRANCH=multiaxes
 SUFFIX=
 VERSION=
 GENERATE_DOC=0

@@ -43,7 +43,10 @@ class QWT_EXPORT QwtPlotPicker : public QwtPicker
     explicit QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId,
         RubberBand rubberBand, DisplayMode trackerMode, QWidget* );
 
-    virtual void setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId );
+    void setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId );
+
+    void setXAxis( QwtAxisId );
+    void setYAxis( QwtAxisId );
 
     QwtAxisId xAxis() const;
     QwtAxisId yAxis() const;
@@ -108,6 +111,8 @@ class QWT_EXPORT QwtPlotPicker : public QwtPicker
     virtual void move( const QPoint& ) QWT_OVERRIDE;
     virtual void append( const QPoint& ) QWT_OVERRIDE;
     virtual bool end( bool ok = true ) QWT_OVERRIDE;
+
+    virtual void axesChanged();
 
   private:
     class PrivateData;

@@ -40,6 +40,7 @@ HEADERS += \
     qwt_scale_draw.h \
     qwt_scale_engine.h \
     qwt_scale_map.h \
+    qwt_scale_map_table.h \
     qwt_spline.h \
     qwt_spline_basis.h \
     qwt_spline_parametrization.h \
@@ -105,6 +106,7 @@ SOURCES += \
 contains(QWT_CONFIG, QwtPlot) {
 
     HEADERS += \
+        qwt_axis_id.h \
         qwt_curve_fitter.h \
         qwt_spline_curve_fitter.h \
         qwt_weeding_curve_fitter.h \
@@ -158,6 +160,7 @@ contains(QWT_CONFIG, QwtPlot) {
         qwt_scale_widget.h 
 
     SOURCES += \
+        qwt_axis_id.cpp \
         qwt_curve_fitter.cpp \
         qwt_spline_curve_fitter.cpp \
         qwt_weeding_curve_fitter.cpp \

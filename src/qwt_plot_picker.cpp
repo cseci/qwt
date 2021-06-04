@@ -54,14 +54,36 @@ QwtPlotPicker::QwtPlotPicker( QWidget* canvas )
     using namespace QwtAxis;
 
     int xAxis = XBottom;
-    if ( !plot->isAxisVisible( XBottom ) && plot->isAxisVisible( XTop ) )
+    if ( plot->axesCount( XTop, true ) > 0 &&
+        plot->axesCount( XBottom, true ) == 0 )
+    {
         xAxis = XTop;
+    }
+
+    for ( int i = 0; i < plot->axesCount( xAxis ); i++ )
+    {
+        if ( plot->isAxisVisible( QwtAxisId( xAxis, i ) ) )
+        {
+            setXAxis( QwtAxisId( xAxis, i ) );
+            break;
+        }
+    }
 
     int yAxis = YLeft;
-    if ( !plot->isAxisVisible( YLeft ) && plot->isAxisVisible( YRight ) )
+    if ( plot->axesCount( YRight, true ) > 0
+        && plot->axesCount( YLeft, true ) == 0 )
+    {
         yAxis = YRight;
+    }
 
-    setAxes( xAxis, yAxis );
+    for ( int i = 0; i < plot->axesCount( yAxis ); i++ )
+    {
+        if ( plot->isAxisVisible( QwtAxisId( yAxis, i ) ) )
+        {
+            setYAxis( QwtAxisId( yAxis, i ) );
+            break;
+        }
+    }
 }
 
 /*!
@@ -171,14 +193,25 @@ QRectF QwtPlotPicker::scaleRect() const
  */
 void QwtPlotPicker::setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId )
 {
-    const QwtPlot* plt = plot();
-    if ( !plt )
-        return;
+    setXAxis( xAxisId );
+    setYAxis( yAxisId );
+}
 
-    if ( xAxisId != m_data->xAxisId || yAxisId != m_data->yAxisId )
+void QwtPlotPicker::setXAxis( QwtAxisId axisId )
+{
+    if ( axisId != m_data->xAxisId )
     {
-        m_data->xAxisId = xAxisId;
-        m_data->yAxisId = yAxisId;
+        m_data->xAxisId = axisId;
+        axesChanged();
+    }
+}
+
+void QwtPlotPicker::setYAxis( QwtAxisId axisId )
+{
+    if ( axisId != m_data->yAxisId )
+    {
+        m_data->yAxisId = axisId;
+        axesChanged();
     }
 }
 
@@ -388,6 +421,10 @@ QPoint QwtPlotPicker::transform( const QPointF& pos ) const
     const QPointF p( xMap.transform( pos.x() ), yMap.transform( pos.y() ) );
 
     return p.toPoint();
+}
+
+void QwtPlotPicker::axesChanged()
+{
 }
 
 #if QWT_MOC_INCLUDE

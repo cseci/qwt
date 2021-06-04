@@ -12,17 +12,70 @@
 
 #include "qwt_global.h"
 #include "qwt_axis.h"
+#include <qhash.h>
 
-/*!
-    \brief Axis identifier
+class QWT_EXPORT QwtAxisId
+{
+  public:
+    QwtAxisId( int position, int index = 0 );
 
-    An axis id is one of values of QwtAxis::Position.
+    bool operator==( const QwtAxisId& ) const;
+    bool operator!=( const QwtAxisId& ) const;
 
-    QwtAxisId is a placeholder for future releases ( -> multiaxes branch ),
-    where it is possible to have more than one axis at each side of a plot.
+    bool isXAxis() const;
+    bool isYAxis() const;
 
-    \sa QwtAxis
- */
-typedef int QwtAxisId;
+  public:
+    int pos;
+    int id;
+};
+
+inline QwtAxisId::QwtAxisId( int position, int index )
+    : pos( position )
+    , id( index )
+{
+}
+
+inline bool QwtAxisId::operator==( const QwtAxisId& other ) const
+{
+    return ( pos == other.pos ) && ( id == other.id );
+}
+
+inline bool QwtAxisId::operator!=( const QwtAxisId& other ) const
+{
+    return !operator==( other );
+}
+
+inline bool QwtAxisId::isXAxis() const
+{
+    return QwtAxis::isXAxis( pos );
+}
+
+inline bool QwtAxisId::isYAxis() const
+{
+    return QwtAxis::isYAxis( pos );
+}
+
+#if QT_VERSION >= 0x060000
+inline size_t qHash( const QwtAxisId& axisId, size_t seed = 0 ) noexcept
+#else
+inline uint qHash( const QwtAxisId& axisId, uint seed = 0 ) noexcept
+#endif
+{
+    return qHash( axisId.pos, seed ) ^ qHash( axisId.id, seed );
+}
+
+namespace QwtAxis
+{
+    // compatibility APIs
+    inline bool isValid( QwtAxisId axisId )
+        { return isValid( axisId.pos ) && ( axisId.id >= 0 ); }
+    inline bool isXAxis( QwtAxisId axisId ) { return isXAxis( axisId.pos ); }
+    inline bool isYAxis( QwtAxisId axisId ) { return isYAxis( axisId.pos ); }
+}
+
+#ifndef QT_NO_DEBUG_STREAM
+QWT_EXPORT QDebug operator<<( QDebug, const QwtAxisId& );
+#endif
 
 #endif

@@ -274,7 +274,7 @@ QwtPlotShapeItem* Editor::itemAt( const QPoint& pos ) const
             item->rtti() == QwtPlotItem::Rtti_PlotShape )
         {
             QwtPlotShapeItem* shapeItem = static_cast< QwtPlotShapeItem* >( item );
-            const QPointF p( coords[ item->xAxis() ], coords[ item->yAxis() ] );
+            const QPointF p( coords[ item->xAxis().pos ], coords[ item->yAxis().pos ] );
 
             if ( shapeItem->boundingRect().contains( p )
                 && shapeItem->shape().contains( p ) )

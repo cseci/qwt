@@ -46,7 +46,7 @@ class QwtPlotRescaler::PrivateData
         if ( !QwtAxis::isValid( axisId ) )
             return NULL;
 
-        return &m_axisData[ axisId];
+        return &( m_axisDataMap[ axisId.pos ][ axisId.id ] );
     }
 
     QwtAxisId referenceAxis;
@@ -56,7 +56,7 @@ class QwtPlotRescaler::PrivateData
     mutable int inReplot;
 
   private:
-    QwtPlotRescaler::AxisData m_axisData[QwtAxis::AxisPositions];
+    QMap< int, QwtPlotRescaler::AxisData > m_axisDataMap[QwtAxis::AxisPositions];
 };
 
 /*!
@@ -373,20 +373,20 @@ void QwtPlotRescaler::rescale(
     QwtInterval intervals[QwtAxis::AxisPositions];
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
-        const QwtAxisId axisId( axisPos );
+        const QwtAxisId axisId( axisPos, QWT_DUMMY_ID );
         intervals[axisPos] = interval( axisId );
     }
 
     const QwtAxisId refAxis = referenceAxis();
-    intervals[refAxis] = expandScale( refAxis, oldSize, newSize );
+    intervals[refAxis.pos] = expandScale( refAxis, oldSize, newSize );
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
-        const QwtAxisId axisId( axisPos );
+        const QwtAxisId axisId( axisPos, QWT_DUMMY_ID );
         if ( aspectRatio( axisId ) > 0.0 && axisId != refAxis )
         {
             intervals[axisPos] = syncScale(
-                axisId, intervals[refAxis], newSize );
+                axisId, intervals[refAxis.pos ], newSize );
         }
     }
 
@@ -434,7 +434,7 @@ QwtInterval QwtPlotRescaler::expandScale( QwtAxisId axisId,
             double dist = 0.0;
             for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
             {
-                const QwtAxisId axisId( axisPos );
+                const QwtAxisId axisId( axisPos, QWT_DUMMY_ID );
                 const double d = pixelDist( axisId, newSize );
                 if ( d > dist )
                     dist = d;
@@ -600,8 +600,9 @@ void QwtPlotRescaler::updateScales(
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
+        for ( int i = 0; i < plt->axesCount( axisPos ); i++ )
         {
-            const QwtAxisId axisId( axisPos );
+            const QwtAxisId axisId( axisPos, i );
 
             if ( axisId == referenceAxis() || aspectRatio( axisId ) > 0.0 )
             {

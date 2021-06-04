@@ -506,10 +506,10 @@ void QwtPlotItem::legendChanged()
  */
 void QwtPlotItem::setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId )
 {
-    if ( QwtAxis::isXAxis( xAxisId ) )
+    if ( xAxisId.id >= 0 && xAxisId.isXAxis() )
         m_data->xAxisId = xAxisId;
 
-    if ( QwtAxis::isYAxis( yAxisId ) )
+    if ( yAxisId.id >= 0 && yAxisId.isYAxis() )
         m_data->yAxisId = yAxisId;
 
     itemChanged();
@@ -525,7 +525,7 @@ void QwtPlotItem::setAxes( QwtAxisId xAxisId, QwtAxisId yAxisId )
  */
 void QwtPlotItem::setXAxis( QwtAxisId axisId )
 {
-    if ( QwtAxis::isXAxis( axisId ) )
+    if ( axisId.isXAxis() && ( axisId.id >= 0 ) )
     {
         m_data->xAxisId = axisId;
         itemChanged();
@@ -542,7 +542,7 @@ void QwtPlotItem::setXAxis( QwtAxisId axisId )
  */
 void QwtPlotItem::setYAxis( QwtAxisId axisId )
 {
-    if ( QwtAxis::isYAxis( axisId ) )
+    if ( axisId.isYAxis() && ( axisId.id >= 0 ) )
     {
         m_data->yAxisId = axisId;
         itemChanged();

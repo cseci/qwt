@@ -18,6 +18,7 @@
 #include <qstyleoption.h>
 #include <qpainter.h>
 #include <qpainterpath.h>
+#include <qset.h>
 
 static QBitmap qwtBorderMask( const QWidget* canvas, const QSize& size )
 {
@@ -107,13 +108,7 @@ static QBitmap qwtBorderMask( const QWidget* canvas, const QSize& size )
 class QwtPlotPanner::PrivateData
 {
   public:
-    PrivateData()
-    {
-        for ( int axis = 0; axis < QwtAxis::AxisPositions; axis++ )
-            isAxisEnabled[axis] = true;
-    }
-
-    bool isAxisEnabled[QwtAxis::AxisPositions];
+    QSet< QwtAxisId > disabledAxes;
 };
 
 /*!
@@ -153,8 +148,10 @@ QwtPlotPanner::~QwtPlotPanner()
  */
 void QwtPlotPanner::setAxisEnabled( QwtAxisId axisId, bool on )
 {
-    if ( QwtAxis::isValid( axisId ) )
-        m_data->isAxisEnabled[axisId] = on;
+    if ( on )
+        m_data->disabledAxes.remove( axisId );
+    else
+        m_data->disabledAxes.insert( axisId );
 }
 
 /*!
@@ -167,10 +164,7 @@ void QwtPlotPanner::setAxisEnabled( QwtAxisId axisId, bool on )
  */
 bool QwtPlotPanner::isAxisEnabled( QwtAxisId axisId ) const
 {
-    if ( QwtAxis::isValid( axisId ) )
-        return m_data->isAxisEnabled[axisId];
-
-    return true;
+    return !m_data->disabledAxes.contains( axisId );
 }
 
 //! Return observed plot canvas
@@ -227,10 +221,12 @@ void QwtPlotPanner::moveCanvas( int dx, int dy )
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
+        const int axesCount = plot->axesCount( axisPos );
+        for ( int i = 0; i < axesCount; i++ )
         {
-            const QwtAxisId axisId( axisPos );
+            const QwtAxisId axisId( axisPos, i );
 
-            if ( !m_data->isAxisEnabled[axisId] )
+            if ( !isAxisEnabled( axisId ) )
                 continue;
 
             const QwtScaleMap map = plot->canvasMap( axisId );

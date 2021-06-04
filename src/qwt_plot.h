@@ -22,14 +22,15 @@ class QwtScaleWidget;
 class QwtScaleEngine;
 class QwtScaleDiv;
 class QwtScaleMap;
+class QwtScaleMapTable;
 class QwtScaleDraw;
 class QwtTextLabel;
 class QwtInterval;
 class QwtText;
 template< typename T > class QList;
 
-// 6.1 compatibility definitions
-#define QWT_AXIS_COMPAT 1
+#define QWT_AXIS_COMPAT 0 // flag to disable compatibilities - will be removed later
+#define QWT_DUMMY_ID 0 // dummy id to help for migrating the code - will be removed later
 
 /*!
    \brief A 2-D plotting widget
@@ -155,6 +156,9 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
 
     // Axes
 
+    void setAxesCount( int axisPos, int count );
+    int axesCount( int axisPos, bool onlyVisible = false ) const;
+
     bool isAxisValid( QwtAxisId ) const;
 
     void setAxisVisible( QwtAxisId, bool on = true );
@@ -222,14 +226,14 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
     void updateCanvasMargins();
 
     virtual void getCanvasMarginsHint(
-        const QwtScaleMap maps[], const QRectF& canvasRect,
+        const QwtScaleMapTable&, const QRectF& canvasRect,
         double& left, double& top, double& right, double& bottom) const;
 
     virtual bool event( QEvent* ) QWT_OVERRIDE;
     virtual bool eventFilter( QObject*, QEvent* ) QWT_OVERRIDE;
 
     virtual void drawItems( QPainter*, const QRectF&,
-        const QwtScaleMap maps[ QwtAxis::AxisPositions ] ) const;
+        const QwtScaleMapTable& ) const;
 
     virtual QVariant itemToInfo( QwtPlotItem* ) const;
     virtual QwtPlotItem* infoToItem( const QVariant& ) const;
@@ -242,7 +246,7 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
         xBottom = QwtAxis::XBottom,
         xTop    = QwtAxis::XTop,
 
-        axisCnt = QwtAxis::AxisPositions
+        axisCnt = QwtAxis::AxisCount
     };
 
     void enableAxis( int axisId, bool on = true )

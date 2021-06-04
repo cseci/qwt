@@ -43,7 +43,7 @@ class Plot : public QwtPlot
 
   private:
     virtual void drawItems( QPainter*, const QRectF&,
-        const QwtScaleMap maps[QwtAxis::AxisPositions] ) const QWT_OVERRIDE;
+        const QwtScaleMapTable &mapTable ) const QWT_OVERRIDE;
 
     QwtPlotSpectrogram* m_spectrogram;
 

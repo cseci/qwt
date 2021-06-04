@@ -82,26 +82,79 @@ class QwtPlot::ScaleData
   public:
     ScaleData( QwtPlot* plot )
     {
-        using namespace QwtAxis;
+        for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
+            setAxesCount( plot, axisPos, 1 );
+    }
 
-        m_axisData[YLeft].initWidget( QwtScaleDraw::LeftScale, "QwtPlotAxisYLeft", plot );
-        m_axisData[YRight].initWidget( QwtScaleDraw::RightScale, "QwtPlotAxisYRight", plot );
-        m_axisData[XTop].initWidget( QwtScaleDraw::TopScale, "QwtPlotAxisXTop", plot );
-        m_axisData[XBottom].initWidget( QwtScaleDraw::BottomScale, "QwtPlotAxisXBottom", plot );
+    void setAxesCount( QwtPlot* plot, int axisPos, int count )
+    {
+        QVector< AxisData >& axisData = d[axisPos].axisData;
+
+        for ( int i = count; i < axisData.size(); i++ )
+        {
+            delete axisData[i].scaleEngine;
+            delete axisData[i].scaleWidget;
+        }
+
+        const int numAxis = axisData.size();
+        axisData.resize( count );
+
+        for ( int i = numAxis; i < count; i++ )
+        {
+            QString name;
+            QwtScaleDraw::Alignment align = QwtScaleDraw::LeftScale;
+
+            switch( axisPos )
+            {
+                case QwtAxis::YLeft:
+                    align = QwtScaleDraw::LeftScale;
+                    name = "QwtPlotAxisYLeft";
+                    break;
+                case QwtAxis::YRight:
+                    align = QwtScaleDraw::RightScale;
+                    name = "QwtPlotAxisYRight";
+                    break;
+                case QwtAxis::XBottom:
+                    align = QwtScaleDraw::BottomScale;
+                    name = "QwtPlotAxisXBottom";
+                    break;
+                case QwtAxis::XTop:
+                    align = QwtScaleDraw::TopScale;
+                    name = "QwtPlotAxisXTop";
+                    break;
+            }
+
+            if ( i > 0 )
+                name += QString().setNum( i );
+
+
+            axisData[ i ].initWidget( align, name, plot );
+        }
+    }
+
+    inline int axesCount( int pos ) const
+    {
+        if ( !QwtAxis::isValid( pos ) )
+            return -1;
+
+        return d[pos].axisData.count();
     }
 
     inline AxisData& axisData( QwtAxisId axisId )
     {
-        return m_axisData[ axisId ];
+        return d[ axisId.pos ].axisData[ axisId.id ];
     }
 
     inline const AxisData& axisData( QwtAxisId axisId ) const
     {
-        return m_axisData[ axisId ];
+        return d[ axisId.pos ].axisData[ axisId.id ];
     }
 
-  private:
-    AxisData m_axisData[ QwtAxis::AxisPositions ];
+    struct
+    {
+        QVector< AxisData > axisData;
+
+    } d[ QwtAxis::AxisPositions ];
 };
 
 void QwtPlot::initAxesData()
@@ -118,20 +171,47 @@ void QwtPlot::deleteAxesData()
     m_scaleData = NULL;
 }
 
+void QwtPlot::setAxesCount( int axisPos, int count )
+{
+    count = qMax( count, 1 ); // we need at least one axis
+
+    if ( count != axesCount( axisPos ) )
+    {
+        m_scaleData->setAxesCount( this, axisPos, count );
+        autoRefresh();
+    }
+}
+
+int QwtPlot::axesCount( int axisPos, bool onlyVisible ) const
+{
+    int count = 0;
+
+    if ( onlyVisible )
+    {
+        for ( int i = 0; i < m_scaleData->axesCount( axisPos ); i++ )
+        {
+            const QwtAxisId axisId( axisPos, i );
+            if ( m_scaleData->axisData( axisId ).isVisible )
+                count++;
+        }
+    }
+    else
+    {
+        count = m_scaleData->axesCount( axisPos );
+    }
+
+    return count;
+}
+
 /*!
    Checks if an axis is valid
 
    \param axisId axis
    \return \c true if the specified axis exists, otherwise \c false
-
-   \note This method is equivalent to QwtAxis::isValid( axisId ) and simply checks
-         if axisId is one of the values of QwtAxis::Position. It is a placeholder
-         for future releases, where it will be possible to have a customizable number
-         of axes ( multiaxes branch ) at each side.
  */
 bool QwtPlot::isAxisValid( QwtAxisId axisId ) const
 {
-    return QwtAxis::isValid( axisId );
+    return m_scaleData->axesCount( axisId.pos ) > axisId.id;
 }
 
 /*!
@@ -668,7 +748,9 @@ void QwtPlot::updateAxes()
     // Find bounding interval of the item data
     // for all axes, where autoscaling is enabled
 
-    QwtInterval boundingIntervals[QwtAxis::AxisPositions];
+    QVector< QwtInterval > boundingIntervals[QwtAxis::AxisPositions];
+    for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
+        boundingIntervals[axisPos].resize( axesCount( axisPos ) );
 
     const QwtPlotItemList& itmList = itemList();
 
@@ -688,10 +770,18 @@ void QwtPlot::updateAxes()
             const QRectF rect = item->boundingRect();
 
             if ( rect.width() >= 0.0 )
-                boundingIntervals[item->xAxis()] |= QwtInterval( rect.left(), rect.right() );
+            {
+                const QwtAxisId xAxis = item->xAxis();
+                boundingIntervals[ xAxis.pos ][ xAxis.id ] |=
+                    QwtInterval( rect.left(), rect.right() );
+            }
 
             if ( rect.height() >= 0.0 )
-                boundingIntervals[item->yAxis()] |= QwtInterval( rect.top(), rect.bottom() );
+            {
+                const QwtAxisId yAxis = item->yAxis();
+                boundingIntervals[ yAxis.pos ][ yAxis.id ] |=
+                    QwtInterval( rect.top(), rect.bottom() );
+            }
         }
     }
 
@@ -699,8 +789,9 @@ void QwtPlot::updateAxes()
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
+        for ( int i = 0; i < m_scaleData->axesCount( axisPos ); i++ )
         {
-            const QwtAxisId axisId( axisPos );
+            const QwtAxisId axisId( axisPos, i );
 
             AxisData& d = m_scaleData->axisData( axisId );
 
@@ -708,7 +799,7 @@ void QwtPlot::updateAxes()
             double maxValue = d.maxValue;
             double stepSize = d.stepSize;
 
-            const QwtInterval& interval = boundingIntervals[axisId];
+            const QwtInterval& interval = boundingIntervals[axisPos][i];
 
             if ( d.doAutoScale && interval.isValid() )
             {

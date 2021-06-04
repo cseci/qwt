@@ -10,17 +10,12 @@
 #include "qwt_plot.h"
 #include "qwt_scale_map.h"
 #include "qwt_plot_magnifier.h"
+#include <qset.h>
 
 class QwtPlotMagnifier::PrivateData
 {
   public:
-    PrivateData()
-    {
-        for ( int axis = 0; axis < QwtAxis::AxisPositions; axis++ )
-            isAxisEnabled[axis] = true;
-    }
-
-    bool isAxisEnabled[QwtAxis::AxisPositions];
+    QSet< QwtAxisId > disabledAxes;
 };
 
 /*!
@@ -52,8 +47,10 @@ QwtPlotMagnifier::~QwtPlotMagnifier()
  */
 void QwtPlotMagnifier::setAxisEnabled( QwtAxisId axisId, bool on )
 {
-    if ( QwtAxis::isValid( axisId ) )
-        m_data->isAxisEnabled[axisId] = on;
+    if ( on )
+        m_data->disabledAxes.remove( axisId );
+    else
+        m_data->disabledAxes.insert( axisId );
 }
 
 /*!
@@ -66,10 +63,7 @@ void QwtPlotMagnifier::setAxisEnabled( QwtAxisId axisId, bool on )
  */
 bool QwtPlotMagnifier::isAxisEnabled( QwtAxisId axisId ) const
 {
-    if ( QwtAxis::isValid( axisId ) )
-        return m_data->isAxisEnabled[axisId];
-
-    return true;
+    return !m_data->disabledAxes.contains( axisId );
 }
 
 //! Return observed plot canvas
@@ -125,8 +119,11 @@ void QwtPlotMagnifier::rescale( double factor )
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
+        const int axesCount = plt->axesCount( axisPos );
+
+        for ( int i = 0; i < axesCount; i++ )
         {
-            const QwtAxisId axisId( axisPos );
+            const QwtAxisId axisId( axisPos, i );
 
             if ( isAxisEnabled( axisId ) )
             {

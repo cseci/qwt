@@ -360,9 +360,9 @@ void Plot::setAlpha( int alpha )
 }
 
 void Plot::drawItems( QPainter* painter, const QRectF& canvasRect,
-    const QwtScaleMap maps[QwtAxis::AxisPositions] ) const
+    const QwtScaleMapTable &mapTable ) const
 {
-    QwtPlot::drawItems( painter, canvasRect, maps );
+    QwtPlot::drawItems( painter, canvasRect, mapTable );
 
     if ( m_spectrogram )
     {
