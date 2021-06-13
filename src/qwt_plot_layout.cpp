@@ -1234,17 +1234,14 @@ bool QwtPlotLayout::alignCanvasToScale( int axisPos ) const
 {
     if ( !QwtAxis::isValid( axisPos ) )
         return false;
-==== BASE ====
 
     return m_data->engine.alignCanvas( axisPos );
 }
-==== BASE ====
 
 /*!
    Change the spacing of the plot. The spacing is the distance
    between the plot components.
 
-==== BASE ====
    \param spacing New spacing
    \sa setCanvasMargin(), spacing()
  */
@@ -1252,9 +1249,7 @@ void QwtPlotLayout::setSpacing( int spacing )
 {
     m_data->engine.setSpacing( qMax( 0, spacing ) );
 }
-==== BASE ====
 
-==== BASE ====
 /*!
    \return Spacing
    \sa margin(), setSpacing()
@@ -1263,7 +1258,6 @@ int QwtPlotLayout::spacing() const
 {
     return m_data->engine.spacing();
 }
-==== BASE ====
 
 /*!
    \brief Specify the position of the legend
@@ -1334,7 +1328,7 @@ void QwtPlotLayout::setLegendPosition( QwtPlot::LegendPosition pos )
  */
 QwtPlot::LegendPosition QwtPlotLayout::legendPosition() const
 {
-    return m_data->legendPos;
+    return m_data->engine.legendPos();
 }
 
 /*!
@@ -1357,7 +1351,7 @@ void QwtPlotLayout::setLegendRatio( double ratio )
  */
 double QwtPlotLayout::legendRatio() const
 {
-    return m_data->legendRatio;
+    return m_data->engine.legendRatio();
 }
 
 /*!

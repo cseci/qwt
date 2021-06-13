@@ -624,24 +624,21 @@ void QwtPlotRenderer::render( QwtPlot* plot,
 
     for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
     {
-==== BASE ====
-        QwtScaleWidget* scaleWidget = plot->axisWidget( axisId );
-        if ( scaleWidget )
-==== BASE ====
+        for ( int i = 0; i < plot->axesCount( axisPos ); i++ )
         {
-==== BASE ====
-            int baseDist = scaleWidget->margin();
-==== BASE ====
+            const QwtAxisId axisId( axisPos, i );
 
-==== BASE ====
-            int startDist, endDist;
-            scaleWidget->getBorderDistHint( startDist, endDist );
-==== BASE ====
+            QwtScaleWidget* scaleWidget = plot->axisWidget( axisId );
+            if ( scaleWidget )
+            {
+                int baseDist = scaleWidget->margin();
 
-==== BASE ====
-            renderScale( plot, painter, axisId, startDist, endDist,
-                baseDist, layout->scaleRect( axisId ) );
-==== BASE ====
+                int startDist, endDist;
+                scaleWidget->getBorderDistHint( startDist, endDist );
+
+                renderScale( plot, painter, axisId, startDist, endDist,
+                    baseDist, layout->scaleRect( axisId ) );
+            }
         }
     }
 
@@ -652,8 +649,8 @@ void QwtPlotRenderer::render( QwtPlot* plot,
     {
         if ( m_data->layoutFlags & FrameWithScales )
         {
-==== BASE ====
-==== BASE ====
+            const QwtAxisId axisId( axisPos, QWT_DUMMY_ID );
+
             QwtScaleWidget* scaleWidget = plot->axisWidget( axisId );
             if ( scaleWidget  )
                 scaleWidget->setMargin( baseLineDists[axisPos] );
@@ -972,20 +969,15 @@ void QwtPlotRenderer::renderCanvas( const QwtPlot* plot,
 QwtScaleMapTable QwtPlotRenderer::buildCanvasMaps(
     const QwtPlot* plot, const QRectF& canvasRect ) const
 {
-==== BASE ====
-    for ( int axisId = 0; axisId < QwtPlot::axisCnt; axisId++ )
-==== BASE ====
-    {
-==== BASE ====
-        maps[axisId].setTransformation(
-            plot->axisScaleEngine( axisId )->transformation() );
-==== BASE ====
+    QwtScaleMapTable mapTable;
 
-==== BASE ====
-        const QwtScaleDiv& scaleDiv = plot->axisScaleDiv( axisId );
-        maps[axisId].setScaleInterval(
-            scaleDiv.lowerBound(), scaleDiv.upperBound() );
-==== BASE ====
+    for ( int axisPos = 0; axisPos < QwtAxis::AxisPositions; axisPos++ )
+    {
+        for ( int i = 0; i < plot->axesCount( axisPos ); i++ )
+        {
+            const QwtAxisId axisId( axisPos, i );
+
+            QwtScaleMap scaleMap;
 
             scaleMap.setTransformation(
                 plot->axisScaleEngine( axisId )->transformation() );
@@ -1029,8 +1021,10 @@ QwtScaleMapTable QwtPlotRenderer::buildCanvasMaps(
                     to = canvasRect.right() - margin;
                 }
             }
-==== BASE ====
-==== BASE ====
+            scaleMap.setPaintInterval( from, to );
+
+            mapTable.maps[axisPos] += scaleMap;
+
         }
     }
 
@@ -1040,12 +1034,11 @@ QwtScaleMapTable QwtPlotRenderer::buildCanvasMaps(
 bool QwtPlotRenderer::updateCanvasMargins( QwtPlot* plot,
     const QRectF& canvasRect, const QwtScaleMapTable& mapsTable ) const
 {
-==== BASE ====
-    double margins[QwtPlot::axisCnt];
-    plot->getCanvasMarginsHint( maps, canvasRect,
-        margins[QwtPlot::yLeft], margins[QwtPlot::xTop],
-        margins[QwtPlot::yRight], margins[QwtPlot::xBottom] );
-==== BASE ====
+    using namespace QwtAxis;
+
+    double margins[AxisPositions];
+    plot->getCanvasMarginsHint( mapsTable, canvasRect,
+        margins[YLeft], margins[XTop], margins[YRight], margins[XBottom] );
 
     bool marginsChanged = false;
     for ( int axisId = 0; axisId < AxisPositions; axisId++ )
