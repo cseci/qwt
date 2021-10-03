@@ -77,6 +77,8 @@ namespace
     };
 }
 
+Q_DECLARE_TYPEINFO( AxisData, Q_MOVABLE_TYPE );
+
 class QwtPlot::ScaleData
 {
   public:
