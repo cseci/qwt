@@ -41,7 +41,7 @@ class Settings
         canvas.paintOnScreen = false;
         canvas.immediatePaint = true;
 #ifndef QWT_NO_OPENGL
-        canvas.openGL = false;
+		canvas.openGL = true;
 #endif
 
         updateType = RepaintCanvas;
