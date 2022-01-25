@@ -51,6 +51,12 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( QwtPlot* plot )
     , QwtPlotAbstractGLCanvas( this )
 {
     init();
+    QSurfaceFormat fmt = format();
+#ifndef __ANDROID__
+    fmt.setSamples( 4 );
+#endif
+
+    init( fmt );
 }
 
 /*!
