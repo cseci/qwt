@@ -34,7 +34,7 @@ else {
 }
 
 QMAKE_RPATHDIR *= $${QWT_OUT_ROOT}/lib
-qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)
+qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_arm64-v8a)
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 
