@@ -165,6 +165,8 @@ void Plot::setSettings( const Settings& s )
             plotCanvas->setLineWidth( 1 );
 
             setCanvas( plotCanvas );
+			plotCanvas->setPaintAttribute(
+				QwtPlotOpenGLCanvas::ImmediatePaint, s.canvas.immediatePaint );
         }
 #else
         QwtPlotGLCanvas* plotCanvas = qobject_cast< QwtPlotGLCanvas* >( canvas() );
