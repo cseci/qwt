@@ -35,7 +35,7 @@ namespace
 
         ~AxisData()
         {
-            delete scaleEngine;
+			//delete scaleEngine;
         }
 
         void initWidget( QwtScaleDraw::Alignment align, const QString& name, QwtPlot* plot )
