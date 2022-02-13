@@ -94,7 +94,6 @@ class QwtPlot::ScaleData
 
         for ( int i = count; i < axisData.size(); i++ )
         {
-            delete axisData[i].scaleEngine;
             delete axisData[i].scaleWidget;
         }
 
