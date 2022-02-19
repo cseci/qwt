@@ -24,7 +24,7 @@ unix {
 }
 
 win32 {
-    QWT_INSTALL_PREFIX    = C:/Qwt-$$QWT_VERSION-dev
+    QWT_INSTALL_PREFIX    = ""
     # QWT_INSTALL_PREFIX = C:/Qwt-$$QWT_VERSION-dev-qt-$$QT_VERSION
 }
 
@@ -128,9 +128,9 @@ QWT_CONFIG     += QwtDesigner
 # environment of the designer/creator.
 ######################################################################
 
-win32 {
-    QWT_CONFIG     += QwtDesignerSelfContained
-}
+#win32 {
+#    QWT_CONFIG     += QwtDesignerSelfContained
+#}
 
 ######################################################################
 # If you want to auto build the examples, enable the line below
