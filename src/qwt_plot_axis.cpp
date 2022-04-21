@@ -363,7 +363,11 @@ int QwtPlot::axisMaxMinor( QwtAxisId axisId ) const
  */
 const QwtScaleDiv& QwtPlot::axisScaleDiv( QwtAxisId axisId ) const
 {
-    return m_scaleData->axisData( axisId ).scaleDiv;
+    if ( isAxisValid( axisId ) )
+        return m_scaleData->axisData( axisId ).scaleDiv;
+
+    static QwtScaleDiv dummyScaleDiv;
+    return dummyScaleDiv;
 }
 
 /*!
@@ -766,20 +770,21 @@ void QwtPlot::updateAxes()
         if ( !item->isVisible() )
             continue;
 
-        if ( axisAutoScale( item->xAxis() ) || axisAutoScale( item->yAxis() ) )
+        const QwtAxisId xAxis = item->xAxis();
+        const QwtAxisId yAxis = item->yAxis();
+
+        if ( axisAutoScale( xAxis ) || axisAutoScale( yAxis ) )
         {
             const QRectF rect = item->boundingRect();
 
-            if ( rect.width() >= 0.0 )
+            if ( axisAutoScale( xAxis ) && rect.width() >= 0.0 )
             {
-                const QwtAxisId xAxis = item->xAxis();
                 boundingIntervals[ xAxis.pos ][ xAxis.id ] |=
                     QwtInterval( rect.left(), rect.right() );
             }
 
-            if ( rect.height() >= 0.0 )
+            if ( axisAutoScale( yAxis ) && rect.height() >= 0.0 )
             {
-                const QwtAxisId yAxis = item->yAxis();
                 boundingIntervals[ yAxis.pos ][ yAxis.id ] |=
                     QwtInterval( rect.top(), rect.bottom() );
             }
@@ -838,4 +843,3 @@ void QwtPlot::updateAxes()
         }
     }
 }
-
