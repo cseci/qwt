@@ -100,7 +100,7 @@ QWT_CONFIG     += QwtWidgets
 # export a plot to a SVG document
 ######################################################################
 
-QWT_CONFIG     += QwtSvg
+#QWT_CONFIG     += QwtSvg
 
 ######################################################################
 # If you want to use a OpenGL plot canvas
