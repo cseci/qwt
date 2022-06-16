@@ -172,7 +172,7 @@ contains(QWT_CONFIG, QwtPlot) {
                 QwtPolarPlot \
                 QwtPolarRenderer \
                 QwtPolarSpectrogram
-    }
+        }
 }
 
 contains(QWT_CONFIG, QwtOpenGL) {
