@@ -154,6 +154,25 @@ contains(QWT_CONFIG, QwtPlot) {
         QwtVectorFieldData \
         QwtVectorFieldSample \
         QwtCPointerData
+
+        contains(QWT_CONFIG, QwtPolar) {
+
+            CLASSHEADERS += \
+                QwtPolarCanvas \
+                QwtPolarCurve \
+                QwtPolarFitter \
+                QwtPolarGrid \
+                QwtPolarItem \
+                QwtPolarItemDict \
+                QwtPolarLayout \
+                QwtPolarMagnifier \
+                QwtPolarMarker \
+                QwtPolarPanner \
+                QwtPolarPicker \
+                QwtPolarPlot \
+                QwtPolarRenderer \
+                QwtPolarSpectrogram
+    }
 }
 
 contains(QWT_CONFIG, QwtOpenGL) {
