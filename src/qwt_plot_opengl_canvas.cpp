@@ -55,8 +55,8 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( QwtPlot* plot )
 #ifndef __ANDROID__
     fmt.setSamples( 4 );
 #endif
-
-    init( fmt );
+    m_data->numFBOSamples = fmt.samples();
+    setFormat(fmt);
 }
 
 /*!
